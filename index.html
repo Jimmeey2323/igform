@@ -39,8 +39,8 @@
             display: block;
             margin: 10px auto;
             margin-bottom: 10px;
-            margin-top:0px;
-            align-items:right;
+            margin-top: 0px;
+            align-items: right;
         }
         #lead-form {
             padding: 10px;
@@ -65,8 +65,8 @@
             display: flex;
             justify-content: space-between;
             margin-top: 25px;
-            margin-bottom:5px;
-            width: calc(100% - 10px);   
+            margin-bottom: 5px;
+            width: calc(100% - 10px);
         }
 
         button {
@@ -104,10 +104,10 @@
             margin-top: -5px;
             margin-bottom: 5px;
         }
-      
-      .required {
-        color: red;
-      }
+
+        .required {
+            color: red;
+        }
     </style>
 </head>
 <body>
@@ -118,35 +118,35 @@
                     <img src="https://i.imgur.com/9mOm7gP.png" alt="Logo">
                 </div>
                 <label for="firstName">First Name <span class="required">*</span></label>
-                    <input type="text" id="firstName" name="firstName" required>
-                    
-                    <label for="lastName">Last Name <span class="required">*</span></label>
-                    <input type="text" id="lastName" name="lastName" required>
-                    
-                    <label for="email">Email <span class="required">*</span></label>
-                    <input type="email" id="email" name="email" required>
-                    
-                    <label for="phoneNumber">Phone Number <span class="required">*</span></label>
-                    <input type="tel" id="phoneNumber" name="phoneNumber" required placeholder="+91XXXXXXXXXX" oninput="formatPhoneNumber()">
-                    
-                    <label for="time">What is your preferred time to connect?<span class="required">*</span></label>
-                    <select id="time" name="time" required>
-                        <option value="" disabled selected>Preferred Time</option>
-                        <option value="Any">Any</option>
-                        <option value="Morning">Morning</option>
-                        <option value="Noon">Noon</option>
-                        <option value="Evening">Evening</option>
-                    </select>
-                
+                <input type="text" id="firstName" name="firstName" required>
+
+                <label for="lastName">Last Name <span class="required">*</span></label>
+                <input type="text" id="lastName" name="lastName" required>
+
+                <label for="email">Email <span class="required">*</span></label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="phoneNumber">Phone Number <span class="required">*</span></label>
+                <input type="tel" id="phoneNumber" name="phoneNumber" required placeholder="+91XXXXXXXXXX" oninput="formatPhoneNumber()">
+
+                <label for="time">What is your preferred time to connect?<span class="required">*</span></label>
+                <select id="time" name="time" required>
+                    <option value="" disabled selected>Preferred Time</option>
+                    <option value="Any">Any</option>
+                    <option value="Morning">Morning</option>
+                    <option value="Noon">Noon</option>
+                    <option value="Evening">Evening</option>
+                </select>
+
                 <label for="center">Select a Studio Location<span class="required">*</span></label>
-                    <select id="center" name="center" required>
-                        <option value="" disabled selected>Select Preferred Studio Location</option>
-                        <option value="Supreme Headquarters, Bandra">Supreme Headquarters, Bandra</option>
-                        <option value="Kwality House, Kemps Corner">Kwality House, Kemps Corner</option>
-                    </select>
-                
+                <select id="center" name="center" required>
+                    <option value="" disabled selected>Select Preferred Studio Location</option>
+                    <option value="Supreme Headquarters, Bandra">Supreme Headquarters, Bandra</option>
+                    <option value="Kwality House, Kemps Corner">Kwality House, Kemps Corner</option>
+                </select>
+
                 <div id="button-container">
-                    <button id="close-button" class="close">Close</button>    
+                    <button id="close-button" class="close">Close</button>
                     <button type="submit" class="submit">Submit</button>
                 </div>
             </form>
@@ -186,8 +186,6 @@
                 if (!response.ok) {
                     throw new Error('Failed to submit: ' + response.statusText);
                 }
-                // Trigger Meta Pixel only on successful submission
-                fbq('track', 'Lead');
                 window.top.location.href = 'https://momence.com/u/physique-57-india-fffoSp';
             }).catch((error) => {
                 console.error('Error:', error);
@@ -221,22 +219,5 @@
             }
         }
     </script>
-
-    <!-- Meta Pixel script -->
-    <script>
-        !function(f,b,e,v,n,t,s)
-        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-        n.queue=[];t=b.createElement(e);t.async=!0;
-        t.src=v;s=b.getElementsByTagName(e)[0];
-        s.parentNode.insertBefore(t,s)}(window,document,'script',
-        'https://connect.facebook.net/en_US/fbevents.js');
-        fbq('init', '527819981439695');
-        fbq('track', 'PageView');
-    </script>
-    <noscript>
-        <img src="https://www.facebook.com/tr?id=527819981439695&ev=PageView&noscript=1" />
-    </noscript>
 </body>
 </html>
