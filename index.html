@@ -196,7 +196,7 @@
         const phoneInput = window.intlTelInput(phoneInputField, {
             initialCountry: "auto",
             geoIpLookup: function(success, failure) {
-                fetch("https://ipinfo.io?token=YOUR_TOKEN_HERE")
+                fetch("https://ipinfo.io?token=f4dffabf7dfb93")
                     .then(response => response.json())
                     .then(data => success(data.country))
                     .catch(() => success("us"));
