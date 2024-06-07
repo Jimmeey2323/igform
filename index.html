@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book a Trial</title>
     <link href="https://fonts.googleapis.com/css2?family=Play:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.12/css/intlTelInput.css" />
     <style>
         :root {
             --primary-color: #1c90ff;
@@ -108,6 +109,9 @@
         .required {
             color: red;
         }
+        .iti {
+            width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -127,7 +131,7 @@
                 <input type="email" id="email" name="email" required>
 
                 <label for="phoneNumber">Phone Number <span class="required">*</span></label>
-                <input type="tel" id="phoneNumber" name="phoneNumber" required value="+91" placeholder="+91XXXXXXXXXX" oninput="formatPhoneNumber()">
+                <input type="tel" id="phoneNumber" name="phoneNumber" required>
 
                 <label for="time">What is your preferred time to connect?<span class="required">*</span></label>
                 <select id="time" name="time" required>
@@ -153,6 +157,7 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.12/js/intlTelInput.min.js"></script>
     <script>
         const formOverlay = document.getElementById('form-overlay');
         const closeButton = document.getElementById('close-button');
@@ -195,35 +200,21 @@
             });
         });
 
-        function formatPhoneNumber() {
-            let input = document.getElementById('phoneNumber');
-            let number = input.value.replace(/\D/g, ''); // Remove non-digit characters
+        // Initialize intl-tel-input
+        const phoneInputField = document.getElementById('phoneNumber');
+        const phoneInput = window.intlTelInput(phoneInputField, {
+            initialCountry: "in", // Set initial country to India
+            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.12/js/utils.js"
+        });
 
-            // List of recognized country codes
-            const countryCodes = ['1', '33', '971', '44', '63', '65', '34'];
-
-            // Function to check if the number starts with any of the recognized country codes
-            function startsWithCode(num) {
-                return countryCodes.some(code => num.startsWith(code));
-            }
-
-            if (number.length === 10 && !startsWithCode(number)) {
-                // If number is 10 digits and does not start with a recognized code, assume it's Indian
-                input.value = '+91' + number;
-            } else if (startsWithCode(number)) {
-                // If it starts with a recognized country code, just add +
-                input.value = '+' + number;
-            } else {
-                // If none of the above, set the number as is but ensure it starts with +
-                input.value = '+' + number;
-            }
-        }
-
-        // Set default value for phone number input
-        document.addEventListener('DOMContentLoaded', (event) => {
-            let phoneNumberInput = document.getElementById('phoneNumber');
-            if (!phoneNumberInput.value) {
-                phoneNumberInput.value = '+91';
+        // Add validation to the phone number field
+        document.getElementById('lead-form').addEventListener('submit', function(event) {
+            if (!phoneInput.isValidNumber()) {
+                event.preventDefault();
+                alert('Please enter a valid phone number.');
+                submitButton.disabled = false; // Re-enable the button if validation fails
+                submitButton.innerText = 'Submit';
+                return;
             }
         });
     </script>
