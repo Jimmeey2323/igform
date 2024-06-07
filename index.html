@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book a Trial</title>
     <link href="https://fonts.googleapis.com/css2?family=Play:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/css/intlTelInput.css">
     <style>
         :root {
             --primary-color: #1c90ff;
@@ -121,10 +121,7 @@
                 <input type="email" id="email" name="email" required>
 
                 <label for="phoneNumber">Phone Number <span class="required">*</span></label>
-                <div id="phone-container">
-                    <input type="tel" id="countryCode" name="countryCode" class="country-code" value="+91" required>
-                    <input type="tel" id="phoneNumber" name="phoneNumber" required placeholder="XXXXXXXXXX">
-                </div>
+                <input type="tel" id="phoneNumber" name="phoneNumber" required>
 
                 <label for="time">What is your preferred time to connect?<span class="required">*</span></label>
                 <select id="time" name="time" required>
@@ -150,7 +147,8 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/intlTelInput.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/utils.js"></script>
     <script>
         const formOverlay = document.getElementById('form-overlay');
         const closeButton = document.getElementById('close-button');
@@ -161,34 +159,16 @@
             formOverlay.style.display = 'none';
         });
 
-        const phoneInput = document.querySelector('#phoneNumber');
-        phoneInput.addEventListener('input', () => {
-            phoneInput.value = phoneInput.value.replace(/[^\d]/g, ''); // Remove non-digit characters
-        });
-
         document.getElementById('lead-form').addEventListener('submit', function(event) {
             event.preventDefault();
             submitButton.disabled = true;
             submitButton.innerText = 'Submitting...';
 
-            const countryCode = document.getElementById('countryCode').value;
-            const phoneNumber = document.getElementById('phoneNumber').value;
-            const fullPhoneNumber = countryCode + phoneNumber;
-
-            // Validate phone number length and content
-            if (phoneNumber.length < 10 || phoneNumber.length > 15) {
-                alert('Please enter a valid phone number.');
-                submitButton.disabled = false;
-                submitButton.innerText = 'Submit';
-                return;
-            }
-
             const formData = new FormData(this);
             const data = {
                 token: "DOjMVL37Q5",
                 sourceId: "8080",
-                ...Object.fromEntries(formData),
-                fullPhoneNumber: fullPhoneNumber
+                ...Object.fromEntries(formData)
             };
 
             fetch('https://api.momence.com/integrations/customer-leads/13752/collect', {
@@ -206,22 +186,33 @@
             }).catch((error) => {
                 console.error('Error:', error);
                 alert(error.message);
-                submitButton.disabled = false;
+                submitButton.disabled = false; // Re-enable the button if there's an error
                 submitButton.innerText = 'Submit';
             });
         });
 
-        // OTP Validation
-        // This part usually requires backend integration with an SMS provider
-        function sendOTP(phoneNumber) {
-            // Code to send OTP using an SMS service provider
-            // This should trigger an API call to send the OTP to the user's phone number
-        }
+        // Initialize intl-tel-input
+        const phoneInputField = document.querySelector("#phoneNumber");
+        const phoneInput = window.intlTelInput(phoneInputField, {
+            initialCountry: "auto",
+            geoIpLookup: function(success, failure) {
+                fetch("https://ipinfo.io?token=YOUR_TOKEN_HERE")
+                    .then(response => response.json())
+                    .then(data => success(data.country))
+                    .catch(() => success("us"));
+            },
+            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/utils.js"
+        });
 
-        function validateOTP(otp) {
-            // Code to validate OTP
-            // This should trigger an API call to validate the OTP entered by the user
-        }
+        // Validate phone number on submit
+        document.getElementById("lead-form").addEventListener("submit", function(event) {
+            if (!phoneInput.isValidNumber()) {
+                event.preventDefault();
+                alert("Invalid phone number");
+                submitButton.disabled = false;
+                submitButton.innerText = 'Submit';
+            }
+        });
     </script>
 </body>
 </html>
