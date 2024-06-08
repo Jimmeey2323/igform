@@ -61,28 +61,6 @@
             font-family: 'Play', sans-serif;
             font-size: 12px;
         }
-        #countryCode {
-            width: 30%;
-            display: inline-block;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid var(--input-border);
-            border-radius: 5px;
-            box-sizing: border-box;
-            font-family: 'Play', sans-serif;
-            font-size: 12px;
-        }
-        #phoneNumber {
-            width: 68%;
-            display: inline-block;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid var(--input-border);
-            border-radius: 5px;
-            box-sizing: border-box;
-            font-family: 'Play', sans-serif;
-            font-size: 12px;
-        }
         #button-container {
             display: flex;
             justify-content: space-between;
@@ -90,6 +68,7 @@
             margin-bottom: 5px;
             width: calc(100% - 10px);
         }
+
         button {
             width: 48%;
             padding: 10px;
@@ -125,6 +104,7 @@
             margin-top: -5px;
             margin-bottom: 5px;
         }
+
         .required {
             color: red;
         }
@@ -147,22 +127,7 @@
                 <input type="email" id="email" name="email" required>
 
                 <label for="phoneNumber">Phone Number <span class="required">*</span></label>
-                <select id="countryCode" name="countryCode" required>
-                    <option value="+91" data-digits="10" selected>🇮🇳 +91</option>
-                    <option value="+1" data-digits="10">🇺🇸 +1</option>
-                    <option value="+44" data-digits="10">🇬🇧 +44</option>
-                    <option value="+33" data-digits="9">🇫🇷 +33</option>
-                    <option value="+971" data-digits="9">🇦🇪 +971</option>
-                    <option value="+63" data-digits="10">🇵🇭 +63</option>
-                    <option value="+65" data-digits="8">🇸🇬 +65</option>
-                    <option value="+34" data-digits="9">🇪🇸 +34</option>
-                    <option value="+61" data-digits="9">🇦🇺 +61</option>
-                    <option value="+49" data-digits="10">🇩🇪 +49</option>
-                    <option value="+81" data-digits="10">🇯🇵 +81</option>
-                    <option value="+86" data-digits="11">🇨🇳 +86</option>
-                    <option value="+55" data-digits="11">🇧🇷 +55</option>
-                </select>
-                <input type="tel" id="phoneNumber" name="phoneNumber" required placeholder="Phone Number">
+                <input type="tel" id="phoneNumber" name="phoneNumber" required placeholder="+91XXXXXXXXXX" oninput="formatPhoneNumber()">
 
                 <label for="time">What is your preferred time to connect?<span class="required">*</span></label>
                 <select id="time" name="time" required>
@@ -199,36 +164,71 @@
             formOverlay.style.display = 'none';
         });
 
-        function validatePhoneNumber() {
-            const countryCodeInput = document.getElementById('countryCode');
-            const phoneNumberInput = document.getElementById('phoneNumber');
-            const countryCode = countryCodeInput.value;
-            const phoneNumber = phoneNumberInput.value.replace(/\D/g, ''); // Remove non-digit characters
-
-            let isValid = false;
-            let errorMessage = '';
-
-            const selectedOption = countryCodeInput.options[countryCodeInput.selectedIndex];
-            const requiredDigits = selectedOption.getAttribute('data-digits');
-
-            if (phoneNumber.length !== parseInt(requiredDigits, 10)) {
-                errorMessage = `Phone numbers for ${selectedOption.textContent} must be exactly ${requiredDigits} digits.`;
-            } else {
-                isValid = true;
-            }
-
-            if (!isValid) {
-                alert(errorMessage);
-            }
-
-            return isValid;
-        }
-
         document.getElementById('lead-form').addEventListener('submit', function(event) {
-            if (!validatePhoneNumber()) {
-                event.preventDefault();
+            event.preventDefault();
+            submitButton.disabled = true;
+            submitButton.innerText = 'Submitting...';
+
+            const formData = new FormData(this);
+            const selectedCenter = formData.get('center');
+
+            let apiUrl = 'https://api.momence.com/integrations/customer-leads/13752/collect';
+            let token = 'DOjMVL37Q5';
+
+            if (selectedCenter === 'Kenkere House, Bengaluru') {
+                apiUrl = 'https://api.momence.com/integrations/customer-leads/33905/collect';
+                token = 'qy71rOk8en';
             }
+
+            const data = {
+                token: token,
+                sourceId: "8080",
+                ...Object.fromEntries(formData)
+            };
+
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(data)
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to submit: ' + response.statusText);
+                }
+                window.top.location.href = 'https://momence.com/u/physique-57-india-fffoSp';
+            }).catch((error) => {
+                console.error('Error:', error);
+                alert(error.message);
+                submitButton.disabled = false; // Re-enable the button if there's an error
+                submitButton.innerText = 'Submit';
+            });
         });
+
+        function formatPhoneNumber() {
+            let input = document.getElementById('phoneNumber');
+            let number = input.value.replace(/\D/g, ''); // Remove non-digit characters
+
+            // List of recognized country codes
+            const countryCodes = ['1', '33', '971', '44', '63', '65', '34'];
+
+            // Function to check if the number starts with any of the recognized country codes
+            function startsWithCode(num) {
+                return countryCodes.some(code => num.startsWith(code));
+            }
+
+            if (number.length === 10 && !startsWithCode(number)) {
+                // If number is 10 digits and does not start with a recognized code, assume it's Indian
+                input.value = '+91' + number;
+            } else if (startsWithCode(number)) {
+                // If it starts with a recognized country code, just add +
+                input.value = '+' + number;
+            } else {
+                // If none of the above, set the number as is but ensure it starts with +
+                input.value = '+' + number;
+            }
+        }
     </script>
 </body>
 </html>
