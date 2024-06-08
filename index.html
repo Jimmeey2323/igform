@@ -169,29 +169,19 @@
             submitButton.innerText = 'Submitting...';
 
             const formData = new FormData(this);
-            const data = {
-                firstName: formData.get('firstName'),
-                lastName: formData.get('lastName'),
-                email: formData.get('email'),
-                phoneNumber: formData.get('phoneNumber'),
-                time: formData.get('time'),
-                center: formData.get('center')
-            };
+            const data = Object.fromEntries(formData);
 
-            fetch('YOUR_WEB_APP_URL', {
+            fetch('YOUR_WEB_APP_URL', {  // Replace with your Google Apps Script Web App URL
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(data)
             }).then(response => {
                 if (!response.ok) {
                     throw new Error('Failed to submit: ' + response.statusText);
                 }
-                alert('Form submitted successfully!');
-                submitButton.disabled = false;
-                submitButton.innerText = 'Submit';
-                formOverlay.style.display = 'none';
+                window.top.location.href = 'https://momence.com/u/physique-57-india-fffoSp';
             }).catch((error) => {
                 console.error('Error:', error);
                 alert(error.message);
