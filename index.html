@@ -170,23 +170,28 @@
 
             const formData = new FormData(this);
             const data = {
-                token: "DOjMVL37Q5",
-                sourceId: "8080",
-                ...Object.fromEntries(formData)
+                firstName: formData.get('firstName'),
+                lastName: formData.get('lastName'),
+                email: formData.get('email'),
+                phoneNumber: formData.get('phoneNumber'),
+                time: formData.get('time'),
+                center: formData.get('center')
             };
 
-            fetch('https://api.momence.com/integrations/customer-leads/13752/collect', {
+            fetch('YOUR_WEB_APP_URL', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer DOjMVL37Q5'
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(data)
             }).then(response => {
                 if (!response.ok) {
                     throw new Error('Failed to submit: ' + response.statusText);
                 }
-                window.top.location.href = 'https://momence.com/u/physique-57-india-fffoSp';
+                alert('Form submitted successfully!');
+                submitButton.disabled = false;
+                submitButton.innerText = 'Submit';
+                formOverlay.style.display = 'none';
             }).catch((error) => {
                 console.error('Error:', error);
                 alert(error.message);
