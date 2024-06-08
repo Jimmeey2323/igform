@@ -23,7 +23,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: transparent; /* Transparent background */
+            background-color: transparent;
             z-index: 1000;
         }
         .form-container {
@@ -49,12 +49,34 @@
             margin-bottom: 8px;
             font-weight: 500;
             font-size: 12px;
-            font-family: 'Play', sans-serif;
         }
         #lead-form input[type="text"], #lead-form input[type="email"], #lead-form input[type="tel"], #lead-form select {
             width: calc(100% - 10px);
             padding: 10px;
             margin-bottom: 10px;
+            border: 1px solid var(--input-border);
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-family: 'Play', sans-serif;
+            font-size: 12px;
+        }
+        #phone-container {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        #country-code {
+            width: 30%;
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid var(--input-border);
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-family: 'Play', sans-serif;
+            font-size: 12px;
+        }
+        #phoneNumber {
+            width: 70%;
+            padding: 10px;
             border: 1px solid var(--input-border);
             border-radius: 5px;
             box-sizing: border-box;
@@ -68,21 +90,17 @@
             margin-bottom: 5px;
             width: calc(100% - 10px);
         }
-
         button {
             width: 48%;
             padding: 10px;
             border-radius: 4px;
             cursor: pointer;
             font-size: 12px;
-            font-family: 'Play', sans-serif;
         }
         button.submit {
             background-color: var(--primary-color);
             color: white;
             border: none;
-            font-size: 12px;
-            font-family: 'Play', sans-serif;
         }
         button.submit:hover {
             background-color: var(--hover-color);
@@ -91,8 +109,6 @@
             background-color: #888;
             color: white;
             border: none;
-            font-size: 12px;
-            font-family: 'Play', sans-serif;
         }
         button.close:hover {
             background-color: #666;
@@ -104,7 +120,6 @@
             margin-top: -5px;
             margin-bottom: 5px;
         }
-
         .required {
             color: red;
         }
@@ -127,7 +142,19 @@
                 <input type="email" id="email" name="email" required>
 
                 <label for="phoneNumber">Phone Number <span class="required">*</span></label>
-                <input type="tel" id="phoneNumber" name="phoneNumber" required placeholder="+91XXXXXXXXXX" oninput="formatPhoneNumber()">
+                <div id="phone-container">
+                    <select id="country-code" name="countryCode" required>
+                        <option value="+91" selected>🇮🇳 +91</option>
+                        <option value="+1">🇺🇸 +1</option>
+                        <option value="+44">🇬🇧 +44</option>
+                        <option value="+33">🇫🇷 +33</option>
+                        <option value="+971">🇦🇪 +971</option>
+                        <option value="+63">🇵🇭 +63</option>
+                        <option value="+65">🇸🇬 +65</option>
+                        <option value="+34">🇪🇸 +34</option>
+                    </select>
+                    <input type="tel" id="phoneNumber" name="phoneNumber" required placeholder="XXXXXXXXXX">
+                </div>
 
                 <label for="time">What is your preferred time to connect?<span class="required">*</span></label>
                 <select id="time" name="time" required>
@@ -143,6 +170,7 @@
                     <option value="" disabled selected>Select Preferred Studio Location</option>
                     <option value="Supreme Headquarters, Bandra">Supreme Headquarters, Bandra</option>
                     <option value="Kwality House, Kemps Corner">Kwality House, Kemps Corner</option>
+                    <option value="Kenkere House, Bengaluru">Kenkere House, Bengaluru</option>
                 </select>
 
                 <div id="button-container">
@@ -157,6 +185,8 @@
         const formOverlay = document.getElementById('form-overlay');
         const closeButton = document.getElementById('close-button');
         const submitButton = document.querySelector('button[type=submit]');
+        const phoneNumberInput = document.getElementById('phoneNumber');
+        const countryCodeInput = document.getElementById('country-code');
 
         closeButton.addEventListener('click', function(event) {
             event.preventDefault();
@@ -169,12 +199,26 @@
             submitButton.innerText = 'Submitting...';
 
             const formData = new FormData(this);
-            const data = Object.fromEntries(formData);
+            const center = formData.get('center');
+            let apiUrl = 'https://api.momence.com/integrations/customer-leads/13752/collect';
+            let token = 'DOjMVL37Q5';
 
-            fetch('https://script.google.com/macros/s/AKfycbyIUqf0HnSd06NTsHZLyb2tyY7R0xOm2DVtwhNJHwtlpxvWmMQze8-RHUSpGXsYydKO/exec', {  // Replace with your Google Apps Script Web App URL
+            if (center === 'Kenkere House, Bengaluru') {
+                apiUrl = 'https://api.momence.com/integrations/customer-leads/33905/collect';
+                token = 'qy71rOk8en';
+            }
+
+            const data = {
+                token: token,
+                sourceId: "8080",
+                ...Object.fromEntries(formData)
+            };
+
+            fetch(apiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(data)
             }).then(response => {
@@ -190,29 +234,104 @@
             });
         });
 
-        function formatPhoneNumber() {
-            let input = document.getElementById('phoneNumber');
-            let number = input.value.replace(/\D/g, ''); // Remove non-digit characters
+        function validatePhoneNumber() {
+            const countryCode = countryCodeInput.value;
+            const phoneNumber = phoneNumberInput.value.replace(/\D/g, ''); // Remove non-digit characters
+                        let isValid = false;
+            let errorMessage = '';
 
-            // List of recognized country codes
-            const countryCodes = ['1', '33', '971', '44', '63', '65', '34'];
-
-            // Function to check if the number starts with any of the recognized country codes
-            function startsWithCode(num) {
-                return countryCodes.some(code => num.startsWith(code));
+            switch (countryCode) {
+                case '+91': // India
+                    isValid = phoneNumber.length === 10;
+                    errorMessage = 'Indian phone numbers must be exactly 10 digits.';
+                    break;
+                case '+1': // USA
+                    isValid = phoneNumber.length === 10;
+                    errorMessage = 'US phone numbers must be exactly 10 digits.';
+                    break;
+                case '+44': // UK
+                    isValid = phoneNumber.length === 10;
+                    errorMessage = 'UK phone numbers must be exactly 10 digits.';
+                    break;
+                case '+33': // France
+                    isValid = phoneNumber.length === 9;
+                    errorMessage = 'French phone numbers must be exactly 9 digits.';
+                    break;
+                case '+971': // UAE
+                    isValid = phoneNumber.length === 9;
+                    errorMessage = 'UAE phone numbers must be exactly 9 digits.';
+                    break;
+                case '+63': // Philippines
+                    isValid = phoneNumber.length === 10;
+                    errorMessage = 'Philippine phone numbers must be exactly 10 digits.';
+                    break;
+                case '+65': // Singapore
+                    isValid = phoneNumber.length === 8;
+                    errorMessage = 'Singaporean phone numbers must be exactly 8 digits.';
+                    break;
+                case '+34': // Spain
+                    isValid = phoneNumber.length === 9;
+                    errorMessage = 'Spanish phone numbers must be exactly 9 digits.';
+                    break;
+                default:
+                    isValid = false;
+                    errorMessage = 'Invalid country code selected.';
+                    break;
             }
 
-            if (number.length === 10 && !startsWithCode(number)) {
-                // If number is 10 digits and does not start with a recognized code, assume it's Indian
-                input.value = '+91' + number;
-            } else if (startsWithCode(number)) {
-                // If it starts with a recognized country code, just add +
-                input.value = '+' + number;
-            } else {
-                // If none of the above, set the number as is but ensure it starts with +
-                input.value = '+' + number;
+            if (!isValid) {
+                alert(errorMessage);
             }
+            return isValid;
         }
+
+        phoneNumberInput.addEventListener('blur', validatePhoneNumber);
+        countryCodeInput.addEventListener('change', validatePhoneNumber);
+
+        document.getElementById('lead-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            if (!validatePhoneNumber()) {
+                return;
+            }
+
+            submitButton.disabled = true;
+            submitButton.innerText = 'Submitting...';
+
+            const formData = new FormData(this);
+            const center = formData.get('center');
+            let apiUrl = 'https://api.momence.com/integrations/customer-leads/13752/collect';
+            let token = 'DOjMVL37Q5';
+
+            if (center === 'Kenkere House, Bengaluru') {
+                apiUrl = 'https://api.momence.com/integrations/customer-leads/33905/collect';
+                token = 'qy71rOk8en';
+            }
+
+            const data = {
+                token: token,
+                sourceId: "8080",
+                ...Object.fromEntries(formData)
+            };
+
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(data)
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to submit: ' + response.statusText);
+                }
+                window.top.location.href = 'https://momence.com/u/physique-57-india-fffoSp';
+            }).catch((error) => {
+                console.error('Error:', error);
+                alert(error.message);
+                submitButton.disabled = false; // Re-enable the button if there's an error
+                submitButton.innerText = 'Submit';
+            });
+        });
     </script>
 </body>
 </html>
