@@ -23,7 +23,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: transparent;
+            background-color: transparent; /* Transparent background */
             z-index: 1000;
         }
         .form-container {
@@ -49,6 +49,7 @@
             margin-bottom: 8px;
             font-weight: 500;
             font-size: 12px;
+            font-family: 'Play', sans-serif;
         }
         #lead-form input[type="text"], #lead-form input[type="email"], #lead-form input[type="tel"], #lead-form select {
             width: calc(100% - 10px);
@@ -60,14 +61,11 @@
             font-family: 'Play', sans-serif;
             font-size: 12px;
         }
-        #phone-container {
-            display: flex;
-            margin-bottom: 10px;
-        }
-        #country-code {
+        #countryCode {
             width: 30%;
+            display: inline-block;
             padding: 10px;
-            margin-right: 10px;
+            margin-bottom: 10px;
             border: 1px solid var(--input-border);
             border-radius: 5px;
             box-sizing: border-box;
@@ -75,8 +73,10 @@
             font-size: 12px;
         }
         #phoneNumber {
-            width: 70%;
+            width: 68%;
+            display: inline-block;
             padding: 10px;
+            margin-bottom: 10px;
             border: 1px solid var(--input-border);
             border-radius: 5px;
             box-sizing: border-box;
@@ -96,11 +96,14 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 12px;
+            font-family: 'Play', sans-serif;
         }
         button.submit {
             background-color: var(--primary-color);
             color: white;
             border: none;
+            font-size: 12px;
+            font-family: 'Play', sans-serif;
         }
         button.submit:hover {
             background-color: var(--hover-color);
@@ -109,6 +112,8 @@
             background-color: #888;
             color: white;
             border: none;
+            font-size: 12px;
+            font-family: 'Play', sans-serif;
         }
         button.close:hover {
             background-color: #666;
@@ -142,19 +147,22 @@
                 <input type="email" id="email" name="email" required>
 
                 <label for="phoneNumber">Phone Number <span class="required">*</span></label>
-                <div id="phone-container">
-                    <select id="country-code" name="countryCode" required>
-                        <option value="+91" selected>🇮🇳 +91</option>
-                        <option value="+1">🇺🇸 +1</option>
-                        <option value="+44">🇬🇧 +44</option>
-                        <option value="+33">🇫🇷 +33</option>
-                        <option value="+971">🇦🇪 +971</option>
-                        <option value="+63">🇵🇭 +63</option>
-                        <option value="+65">🇸🇬 +65</option>
-                        <option value="+34">🇪🇸 +34</option>
-                    </select>
-                    <input type="tel" id="phoneNumber" name="phoneNumber" required placeholder="XXXXXXXXXX">
-                </div>
+                <select id="countryCode" name="countryCode" required>
+                    <option value="+91" data-digits="10" selected>🇮🇳 +91</option>
+                    <option value="+1" data-digits="10">🇺🇸 +1</option>
+                    <option value="+44" data-digits="10">🇬🇧 +44</option>
+                    <option value="+33" data-digits="9">🇫🇷 +33</option>
+                    <option value="+971" data-digits="9">🇦🇪 +971</option>
+                    <option value="+63" data-digits="10">🇵🇭 +63</option>
+                    <option value="+65" data-digits="8">🇸🇬 +65</option>
+                    <option value="+34" data-digits="9">🇪🇸 +34</option>
+                    <option value="+61" data-digits="9">🇦🇺 +61</option>
+                    <option value="+49" data-digits="10">🇩🇪 +49</option>
+                    <option value="+81" data-digits="10">🇯🇵 +81</option>
+                    <option value="+86" data-digits="11">🇨🇳 +86</option>
+                    <option value="+55" data-digits="11">🇧🇷 +55</option>
+                </select>
+                <input type="tel" id="phoneNumber" name="phoneNumber" required placeholder="Phone Number">
 
                 <label for="time">What is your preferred time to connect?<span class="required">*</span></label>
                 <select id="time" name="time" required>
@@ -185,152 +193,41 @@
         const formOverlay = document.getElementById('form-overlay');
         const closeButton = document.getElementById('close-button');
         const submitButton = document.querySelector('button[type=submit]');
-        const phoneNumberInput = document.getElementById('phoneNumber');
-        const countryCodeInput = document.getElementById('country-code');
 
         closeButton.addEventListener('click', function(event) {
             event.preventDefault();
             formOverlay.style.display = 'none';
         });
 
-        document.getElementById('lead-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            submitButton.disabled = true;
-            submitButton.innerText = 'Submitting...';
-
-            const formData = new FormData(this);
-            const center = formData.get('center');
-            let apiUrl = 'https://api.momence.com/integrations/customer-leads/13752/collect';
-            let token = 'DOjMVL37Q5';
-
-            if (center === 'Kenkere House, Bengaluru') {
-                apiUrl = 'https://api.momence.com/integrations/customer-leads/33905/collect';
-                token = 'qy71rOk8en';
-            }
-
-            const data = {
-                token: token,
-                sourceId: "8080",
-                ...Object.fromEntries(formData)
-            };
-
-            fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(data)
-            }).then(response => {
-                if (!response.ok) {
-                    throw new Error('Failed to submit: ' + response.statusText);
-                }
-                window.top.location.href = 'https://momence.com/u/physique-57-india-fffoSp';
-            }).catch((error) => {
-                console.error('Error:', error);
-                alert(error.message);
-                submitButton.disabled = false; // Re-enable the button if there's an error
-                submitButton.innerText = 'Submit';
-            });
-        });
-
         function validatePhoneNumber() {
+            const countryCodeInput = document.getElementById('countryCode');
+            const phoneNumberInput = document.getElementById('phoneNumber');
             const countryCode = countryCodeInput.value;
             const phoneNumber = phoneNumberInput.value.replace(/\D/g, ''); // Remove non-digit characters
-                        let isValid = false;
+
+            let isValid = false;
             let errorMessage = '';
 
-            switch (countryCode) {
-                case '+91': // India
-                    isValid = phoneNumber.length === 10;
-                    errorMessage = 'Indian phone numbers must be exactly 10 digits.';
-                    break;
-                case '+1': // USA
-                    isValid = phoneNumber.length === 10;
-                    errorMessage = 'US phone numbers must be exactly 10 digits.';
-                    break;
-                case '+44': // UK
-                    isValid = phoneNumber.length === 10;
-                    errorMessage = 'UK phone numbers must be exactly 10 digits.';
-                    break;
-                case '+33': // France
-                    isValid = phoneNumber.length === 9;
-                    errorMessage = 'French phone numbers must be exactly 9 digits.';
-                    break;
-                case '+971': // UAE
-                    isValid = phoneNumber.length === 9;
-                    errorMessage = 'UAE phone numbers must be exactly 9 digits.';
-                    break;
-                case '+63': // Philippines
-                    isValid = phoneNumber.length === 10;
-                    errorMessage = 'Philippine phone numbers must be exactly 10 digits.';
-                    break;
-                case '+65': // Singapore
-                    isValid = phoneNumber.length === 8;
-                    errorMessage = 'Singaporean phone numbers must be exactly 8 digits.';
-                    break;
-                case '+34': // Spain
-                    isValid = phoneNumber.length === 9;
-                    errorMessage = 'Spanish phone numbers must be exactly 9 digits.';
-                    break;
-                default:
-                    isValid = false;
-                    errorMessage = 'Invalid country code selected.';
-                    break;
+            const selectedOption = countryCodeInput.options[countryCodeInput.selectedIndex];
+            const requiredDigits = selectedOption.getAttribute('data-digits');
+
+            if (phoneNumber.length !== parseInt(requiredDigits, 10)) {
+                errorMessage = `Phone numbers for ${selectedOption.textContent} must be exactly ${requiredDigits} digits.`;
+            } else {
+                isValid = true;
             }
 
             if (!isValid) {
                 alert(errorMessage);
             }
+
             return isValid;
         }
 
-        phoneNumberInput.addEventListener('blur', validatePhoneNumber);
-        countryCodeInput.addEventListener('change', validatePhoneNumber);
-
         document.getElementById('lead-form').addEventListener('submit', function(event) {
-            event.preventDefault();
             if (!validatePhoneNumber()) {
-                return;
+                event.preventDefault();
             }
-
-            submitButton.disabled = true;
-            submitButton.innerText = 'Submitting...';
-
-            const formData = new FormData(this);
-            const center = formData.get('center');
-            let apiUrl = 'https://api.momence.com/integrations/customer-leads/13752/collect';
-            let token = 'DOjMVL37Q5';
-
-            if (center === 'Kenkere House, Bengaluru') {
-                apiUrl = 'https://api.momence.com/integrations/customer-leads/33905/collect';
-                token = 'qy71rOk8en';
-            }
-
-            const data = {
-                token: token,
-                sourceId: "8080",
-                ...Object.fromEntries(formData)
-            };
-
-            fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(data)
-            }).then(response => {
-                if (!response.ok) {
-                    throw new Error('Failed to submit: ' + response.statusText);
-                }
-                window.top.location.href = 'https://momence.com/u/physique-57-india-fffoSp';
-            }).catch((error) => {
-                console.error('Error:', error);
-                alert(error.message);
-                submitButton.disabled = false; // Re-enable the button if there's an error
-                submitButton.innerText = 'Submit';
-            });
         });
     </script>
 </body>
