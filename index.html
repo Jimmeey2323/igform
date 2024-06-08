@@ -174,10 +174,12 @@
 
             let apiUrl = 'https://api.momence.com/integrations/customer-leads/13752/collect';
             let token = 'DOjMVL37Q5';
+            let redirectUrl = 'https://momence.com/u/physique-57-india-fffoSp';
 
             if (selectedCenter === 'Kenkere House, Bengaluru') {
                 apiUrl = 'https://api.momence.com/integrations/customer-leads/33905/collect';
                 token = 'qy71rOk8en';
+                redirectUrl = 'https://momence.com/u/physique-57-bengaluru-0MU0AA';
             }
 
             const data = {
@@ -197,7 +199,7 @@
                 if (!response.ok) {
                     throw new Error('Failed to submit: ' + response.statusText);
                 }
-                window.top.location.href = 'https://momence.com/u/physique-57-india-fffoSp';
+                window.top.location.href = redirectUrl;
             }).catch((error) => {
                 console.error('Error:', error);
                 alert(error.message);
